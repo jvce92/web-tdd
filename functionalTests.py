@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import unittest
+import time
 
 class newVisitorTest(unittest.TestCase):
 
@@ -10,6 +11,11 @@ class newVisitorTest(unittest.TestCase):
 
     def tearDown(self):
         self.browser.quit()
+
+    def checkForRowInTable(self,rowText):
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(rowText, [row.text for row in rows])
 
     def testPageTitle(self):
 
@@ -27,9 +33,12 @@ class newVisitorTest(unittest.TestCase):
         inputBox.send_keys('Buy peacock feathers')
         inputBox.send_keys(Keys.ENTER)
         #check if the new entry is at the to-do list
-        table = self.browser.find_elements_by_id('id_list_table')
-        rows = table.find_element_by_tag_name('tr')
-        self.assertEqual(any(row.tex == '1: Buy peacock feathers' for row in rows))
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        # self.assertTrue(any(row.text == '1: Buy peacock feathers' for row in rows),
+        #                 'New to-do item does not appear in the table --its text was: \n %s' % (table.text,))
+        #better way to check for the new item
+        self.assertIn('1: Buy peacock feathers',[row.text for row in rows])
 
         self.fail('Finish the test!')
 
