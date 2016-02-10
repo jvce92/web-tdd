@@ -42,6 +42,5 @@ class newVisitorTest(unittest.TestCase):
 
         self.fail('Finish the test!')
 
-
 if __name__ == '__main__':
     unittest.main(warnings='ignore')
