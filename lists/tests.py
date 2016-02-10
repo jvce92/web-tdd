@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.core.urlresolvers import resolve
 from lists.views import homePage
+from django.http import HttpRequest
 
 # Create your tests here.
 #
@@ -14,3 +15,10 @@ class homePageTest(TestCase):
     def testRootUrlResolvesToHomePage(self):
         found = resolve('/')
         self.assertEqual(found.func,homePage)
+
+    def testHomePageReturnsHtml(self):
+        request = HttpRequest()
+        response = homePage(request)
+        self.assertTrue(response.content.startswith(b'<html>'))
+        self.assertIn(b'<title>To-Do</title>',response.content)
+        self.assertTrue(response.content.endswith(b'</html>'))
