@@ -32,13 +32,13 @@ class newVisitorTest(unittest.TestCase):
         #test a new list input
         inputBox.send_keys('Buy peacock feathers')
         inputBox.send_keys(Keys.ENTER)
-        #check if the new entry is at the to-do list
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        # self.assertTrue(any(row.text == '1: Buy peacock feathers' for row in rows),
-        #                 'New to-do item does not appear in the table --its text was: \n %s' % (table.text,))
-        #better way to check for the new item
-        self.assertIn('1: Buy peacock feathers',[row.text for row in rows])
+
+        inputBox = self.browser.find_element_by_id('id_new_item')
+        inputBox.send_keys('Use peacock feathers to make a fly')
+        inputBox.send_keys(Keys.ENTER)
+
+        self.checkForRowInTable('1: Buy peacock feathers')
+        self.checkForRowInTable('2: Use peacock feathers to make a fly')
 
         self.fail('Finish the test!')
 
