@@ -31,12 +31,27 @@ class newVisitorTest(LiveServerTestCase):
         #test a new list input
         inputBox.send_keys('Buy peacock feathers')
         inputBox.send_keys(Keys.ENTER)
+        userListUrl = self.browser.current_url
+        self.assertRegex(userListUrl, '/lists/.+')
+        self.checkForRowInTable('1: Buy peacock feathers')
 
         inputBox = self.browser.find_element_by_id('id_new_item')
         inputBox.send_keys('Use peacock feathers to make a fly')
         inputBox.send_keys(Keys.ENTER)
-
-        self.checkForRowInTable('1: Buy peacock feathers')
         self.checkForRowInTable('2: Use peacock feathers to make a fly')
+        #a new user shows up
+        self.browser.quit()
+        self.browser = webdriver.Firefox()
+        inputBox = self.browser.find_element_by_id('id_new_item')
+        inputBox.send_keys('Buy milk')
+        inputBox.send_keys(Keys.Enter)
+        #check if this is actually the new user's page
+        newUserListUrl = self.browser.current_url
+        self.assertRegex(newUserListUrl,'/lists/.+')
+        self.assertNotEqual(userListUrl,newUserListUrl)
+        #check for new user input (and that old user input is not present)
+        pageText = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy peacock feathers',pageText)
+        self.assertIn('Buy milk', pageText)
 
         self.fail('Finish the test!')
