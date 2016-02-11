@@ -1,9 +1,9 @@
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
-import unittest
 import time
 
-class newVisitorTest(unittest.TestCase):
+class newVisitorTest(LiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Firefox()
@@ -18,9 +18,8 @@ class newVisitorTest(unittest.TestCase):
         self.assertIn(rowText, [row.text for row in rows])
 
     def testPageTitle(self):
-
         #Access the to-do list website
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
 
         #checks for the website title
         self.assertIn('To-Do',self.browser.title)
@@ -41,6 +40,3 @@ class newVisitorTest(unittest.TestCase):
         self.checkForRowInTable('2: Use peacock feathers to make a fly')
 
         self.fail('Finish the test!')
-
-if __name__ == '__main__':
-    unittest.main(warnings='ignore')
