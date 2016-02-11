@@ -32,10 +32,37 @@ class homePageTest(TestCase):
         request = HttpRequest()
         request.method = 'POST'
         request.POST['item_text'] = 'A new list item'
+
         response = homePage(request)
-        self.assertIn('A new list item', response.content.decode())
-        expectedHtml = render_to_string('home.html', {'new_item_text':'A new list item'})
-        self.assertEqual(response.content.decode(),expectedHtml)
+
+        self.assertEqual(Item.objects.count(),1)
+        newItem = Item.objects.first()
+        self.assertEqual(newItem.text,'A new list item')
+
+    def testRedirectsAfterPost(self):
+        request = HttpRequest()
+        request.method = 'POST'
+        request.POST['item_text'] = 'A new list item'
+
+        response = homePage(request)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], '/')
+
+    def testHomePageOnlySavesItemWhenNecessary(self):
+        request = HttpRequest()
+        homePage(request)
+        self.assertEqual(Item.objects.count(),0)
+
+    def testDisplayAllListElements(self):
+        Item.objects.create(text='item 1')
+        Item.objects.create(text='item 2')
+
+        request = HttpRequest()
+        response = homePage(request)
+
+        self.assertIn('item 1', response.content.decode())
+        self.assertIn('item 2', response.content.decode())
 
 class ItemModelTest(TestCase):
 
