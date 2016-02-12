@@ -3,7 +3,7 @@ from django.core.urlresolvers import resolve
 from lists.views import homePage
 from django.http import HttpRequest
 from django.template.loader import render_to_string
-from lists.models import Item
+from lists.models import Item, List
 
 
 # Create your tests here.
@@ -25,30 +25,41 @@ class homePageTest(TestCase):
         expectedHtml = render_to_string('home.html')
         self.assertEqual(expectedHtml,response.content.decode())
 
-class ItemModelTest(TestCase):
+class ListAndItemModelsTest(TestCase):
 
     def testSavingAndRetrievingItems(self):
+        myList = List()
+        myList.save()
+
         firstItem = Item()
         firstItem.text = 'The first list item'
+        firstItem.list = myList
         firstItem.save()
 
         secondItem = Item()
         secondItem.text = 'The second list item'
+        secondItem.list = myList
         secondItem.save()
 
         savedItems = Item.objects.all()
         self.assertEqual(savedItems.count(),2)
 
+        savedLists = List.objects.first()
+        self.assertEqual(savedLists, myList)
+
         firstSavedItem = savedItems[0]
         secondSavedItem = savedItems[1]
         self.assertEqual(firstSavedItem.text,'The first list item')
         self.assertEqual(secondSavedItem.text,'The second list item')
+        self.assertEqual(firstSavedItem.list, myList)
+        self.assertEqual(secondSavedItem.list, myList)
 
 class ListViewTest(TestCase):
 
     def testDisplayAllItems(self):
-        Item.objects.create(text='item1')
-        Item.objects.create(text='item2')
+        myList = List.objects.create()
+        Item.objects.create(text='item1', list = myList)
+        Item.objects.create(text='item2', list = myList)
 
         response = self.client.get('/lists/the-only-list-in-the-world/')
 
