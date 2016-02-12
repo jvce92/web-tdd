@@ -42,9 +42,11 @@ class newVisitorTest(LiveServerTestCase):
         #a new user shows up
         self.browser.quit()
         self.browser = webdriver.Firefox()
+        self.browser.get(self.live_server_url)
+
         inputBox = self.browser.find_element_by_id('id_new_item')
         inputBox.send_keys('Buy milk')
-        inputBox.send_keys(Keys.Enter)
+        inputBox.send_keys(Keys.ENTER)
         #check if this is actually the new user's page
         newUserListUrl = self.browser.current_url
         self.assertRegex(newUserListUrl,'/lists/.+')
