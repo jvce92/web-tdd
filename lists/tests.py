@@ -24,35 +24,6 @@ class homePageTest(TestCase):
         response = homePage(request)
         expectedHtml = render_to_string('home.html')
         self.assertEqual(expectedHtml,response.content.decode())
-        # self.assertTrue(response.content.startswith(b'<html>'))
-        # self.assertIn(b'<title>To-Do lists</title>',response.content)
-        # self.assertTrue(response.content.strip().endswith(b'</html>'))
-
-    def testHandlePostRequest(self):
-        request = HttpRequest()
-        request.method = 'POST'
-        request.POST['item_text'] = 'A new list item'
-
-        response = homePage(request)
-
-        self.assertEqual(Item.objects.count(),1)
-        newItem = Item.objects.first()
-        self.assertEqual(newItem.text,'A new list item')
-
-    def testRedirectsAfterPost(self):
-        request = HttpRequest()
-        request.method = 'POST'
-        request.POST['item_text'] = 'A new list item'
-
-        response = homePage(request)
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/lists/the-only-list-in-the-world/')
-
-    def testHomePageOnlySavesItemWhenNecessary(self):
-        request = HttpRequest()
-        homePage(request)
-        self.assertEqual(Item.objects.count(),0)
 
 class ItemModelTest(TestCase):
 
@@ -87,3 +58,20 @@ class ListViewTest(TestCase):
     def testUseDifferentTemplates(self):
         response = self.client.get('/lists/the-only-list-in-the-world/')
         self.assertTemplateUsed(response,'list.html')
+
+class NewListTest(TestCase):
+
+    def testHandlePostRequest(self):
+        self.client.post(
+        '/lists/new', data = {'item_text':'New item', }
+        )
+
+        self.assertEqual(Item.objects.count(),1)
+        newItem = Item.objects.first()
+        self.assertEqual(newItem.text,'New item')
+
+    def testRedirectsAfterPost(self):
+        response = self.client.post(
+        '/lists/new', data = {'item_text': 'New item', }
+        )
+        self.assertRedirects(response, '/lists/the-only-list-in-the-world/')
