@@ -56,18 +56,41 @@ class ListAndItemModelsTest(TestCase):
 
 class ListViewTest(TestCase):
 
+    def testUsesListTemplate(self):
+        myList = List.objects.create()
+        response = self.client.get('/lists/%d/' % (myList.id,))
+        self.assertTemplateUsed(response, 'list.html')
+
+    def testDisplaysOnlyItemsForThatList(self):
+        correctList = List.objects.create()
+        Item.objects.create(text='item1', list = correctList)
+        Item.objects.create(text='item2', list = correctList)
+
+        wrongList = List.objects.create()
+        Item.objects.create(text='otherItem1', list = wrongList)
+        Item.objects.create(text='otherItem2', list = wrongList)
+
+        response = self.client.get('/lists/%d/' % (correctList.id, ))
+
+        self.assertContains(response, 'item1')
+        self.assertContains(response, 'item2')
+        self.assertNotContains(response, 'otherItem1')
+        self.assertNotContains(response, 'otherItem2')
+
+
     def testDisplayAllItems(self):
         myList = List.objects.create()
         Item.objects.create(text='item1', list = myList)
         Item.objects.create(text='item2', list = myList)
 
-        response = self.client.get('/lists/the-only-list-in-the-world/')
+        response = self.client.get('/lists/%d/' % (myList.id, ))
 
         self.assertContains(response, 'item1')
         self.assertContains(response, 'item2')
 
     def testUseDifferentTemplates(self):
-        response = self.client.get('/lists/the-only-list-in-the-world/')
+        myList = List.objects.create()
+        response = self.client.get('/lists/%d/' % (myList.id, ))
         self.assertTemplateUsed(response,'list.html')
 
 class NewListTest(TestCase):
@@ -85,4 +108,38 @@ class NewListTest(TestCase):
         response = self.client.post(
         '/lists/new', data = {'item_text': 'New item', }
         )
-        self.assertRedirects(response, '/lists/the-only-list-in-the-world/')
+        newList = List.objects.first()
+        self.assertRedirects(response, '/lists/%d/' % (newList.id, ))
+
+    def testCanSavePostToAnExistingList(self):
+        wrongList = List.objects.create()
+        correctList = List.objects.create()
+
+        self.client.post(
+        '/lists/%d/addItem' % (correctList.id,), data = {'item_text':'New item for existing list'}
+        )
+
+        self.assertEqual(Item.objects.count(),1)
+        newItem = Item.objects.first()
+        self.assertEqual(newItem.text,'New item for existing list')
+        self.assertEqual(newItem.list,correctList)
+
+    def testRedirectsToListView(self):
+        wrongList = List.objects.create()
+        correctList = List.objects.create()
+
+        response = self.client.post(
+        '/lists/%d/addItem' % (correctList.id,), data = {'item_text':'New item for existing list'}
+        )
+
+        self.assertRedirects(response,'/lists/%d/' % (correctList.id, ))
+
+    def testPassesCorrectListToTemplate(self):
+        wrongList = List.objects.create()
+        correctList = List.objects.create()
+
+        response = self.client.get(
+        '/lists/%d/' % (correctList.id, ),
+        )
+
+        self.assertEqual(response.context['list'],correctList)
