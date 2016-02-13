@@ -56,4 +56,9 @@ class newVisitorTest(LiveServerTestCase):
         self.assertNotIn('Buy peacock feathers',pageText)
         self.assertIn('Buy milk', pageText)
 
-        self.fail('Finish the test!')
+    def testLayouAndStyling(self):
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024,768)
+
+        inputBox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(inputBox.location['x'] + inputBox.size['width']/2, 512, delta=5)
