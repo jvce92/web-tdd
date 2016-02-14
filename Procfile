@@ -1,1 +1,1 @@
-web: gunicorn superlists.wgsi:application
+web: gunicorn superlists.wgsi
