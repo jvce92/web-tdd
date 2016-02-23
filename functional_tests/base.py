@@ -9,13 +9,13 @@ class FunctionalTests(StaticLiveServerTestCase):
             if 'liveserver' in arg:
                 cls.server_url = 'http://' + arg.split('=')[1]
                 return #
-        super().setUpClass()
+        super(FunctionalTests,cls).setUpClass()
         cls.server_url = cls.live_server_url
 
     @classmethod
     def tearDownClass(cls):
         if cls.server_url == cls.live_server_url:
-            super().tearDownClass()
+            super(FunctionalTests,cls).tearDownClass()
 
     def setUp(self):
         self.browser = webdriver.Firefox()
