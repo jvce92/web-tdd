@@ -17,7 +17,7 @@ def viewList(request,listID):
             item = Item(text=request.POST['item_text'], list = myList)
             item.full_clean()
             item.save()
-            return redirect('/lists/%d/' % (myList.id, ))
+            return redirect('view_list', myList.id)
         except ValidationError:
             error = "You can't have an empty list item!"
     return  render(request, 'list.html', {'list': myList, 'error': error,} )
@@ -32,4 +32,4 @@ def newList(request):
         error = "You can't have an empty list item!"
         return render(request, 'home.html', {'error': error,})
 
-    return redirect('/lists/%d/' % (myList.id, ))
+    return redirect('view_list', myList.id)
