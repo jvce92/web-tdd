@@ -87,7 +87,7 @@ class NewListTest(TestCase):
         correctList = List.objects.create()
 
         self.client.post(
-        '/lists/%d/addItem' % (correctList.id,), data = {'item_text':'New item for existing list'}
+        '/lists/%d/' % (correctList.id,), data = {'item_text':'New item for existing list'}
         )
 
         self.assertEqual(Item.objects.count(),1)
@@ -100,7 +100,7 @@ class NewListTest(TestCase):
         correctList = List.objects.create()
 
         response = self.client.post(
-        '/lists/%d/addItem' % (correctList.id,), data = {'item_text':'New item for existing list'}
+        '/lists/%d/' % (correctList.id,), data = {'item_text':'New item for existing list'}
         )
 
         self.assertRedirects(response,'/lists/%d/' % (correctList.id, ))
