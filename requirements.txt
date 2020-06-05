@@ -10,7 +10,7 @@ colorama==0.3.3
 command-not-found==0.3
 decorator==3.4.0
 defer==1.0.6
-Django==1.8
+Django==1.11.29
 docutils==0.12
 evdev==0.5.0
 feedparser==5.1.3
